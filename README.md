@@ -33,7 +33,7 @@ Download mixamo pretrained model [here](https://drive.google.com/open?id=120LeeR
 Here inference refers motion retargeting, i.e. transfering motion from a source skeleton to a target skeleton.
 We require the input skeleton sequences (e.g. extracted using a pose estimation method such as OpenPose) be provided in the format of a numpy `.npy` file.
 The file should contain an array with shape `15 x 2 x length`.
-The first dimension (15) corresponds the 15 body joint defined [here]().
+The first dimension (15) corresponds the 15 body joint defined [here](https://github.com/yzhq97/transmomo.pytorch/blob/master/docs/keypoint_format.md).
 The second dimension (2) corresponds to x and y coordinates.
 The third dimenstion (length) is the temporal dimension. Sample command for inference:
 ```shell script
