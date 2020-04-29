@@ -1,5 +1,7 @@
 # TransMoMo: Invariance-Driven Unsupervised Video Motion Retargeting
 
+[![Paper](https://img.shields.io/badge/Python->=3.6-Blue?logo=python)](https://arxiv.org/pdf/2003.14401.pdf)[![Paper](https://img.shields.io/badge/PyTorch->=1.1.0-Orange?logo=pytorch)](https://arxiv.org/pdf/2003.14401.pdf)
+
 ### [Project Page](https://yzhq97.github.io/transmomo/) | [YouTube](https://youtu.be/akbRtnRMkMk) | [Paper](https://arxiv.org/pdf/2003.14401.pdf)
 
 This is the official PyTorch implementation of the CVPR 2020 paper "TransMoMo: Invariance-Driven Unsupervised Video Motion Retargeting".
@@ -104,7 +106,7 @@ motion-disentangle-research.pytorch
 
 ## TODOs
 
-- [ ] Detailed documentation
+- [x] Detailed documentation
 
 - [ ] Add example files
 
@@ -118,13 +120,13 @@ motion-disentangle-research.pytorch
 
 Z. Yang*, W. Zhu*, W. Wu*, C. Qian, Q. Zhou, B. Zhou, C. C. Loy. "TransMoMo: Invariance-Driven Unsupervised Video Motion Retargeting." IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2020. (* indicates equal contribution.)
 
-BibTex:
+BibTeX:
 ```bibtex
 @inproceedings{transmomo2020,
-title={TransMoMo: Invariance-Driven Unsupervised Video Motion Retargeting},
-author={Yang, Zhuoqian and Zhu, Wentao and Wu, Wayne and Qian, Chen and Zhou, Qiang and Zhou, Bolei and Loy, Chen Change},
-booktitle={Computer Vision and Pattern Recognition},
-year={2020}
+  title={TransMoMo: Invariance-Driven Unsupervised Video Motion Retargeting},
+  author={Yang, Zhuoqian and Zhu, Wentao and Wu, Wayne and Qian, Chen and Zhou, Qiang and Zhou, Bolei and Loy, Chen Change},
+  booktitle={The IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year={2020}
 }
 ```
 
