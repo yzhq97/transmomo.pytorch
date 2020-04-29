@@ -119,7 +119,7 @@ motion-disentangle-research.pytorch
 Z. Yang*, W. Zhu*, W. Wu*, C. Qian, Q. Zhou, B. Zhou, C. C. Loy. "TransMoMo: Invariance-Driven Unsupervised Video Motion Retargeting." IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2020. (* indicates equal contribution.)
 
 BibTex:
-```
+```bibtex
 @inproceedings{transmomo2020,
 title={TransMoMo: Invariance-Driven Unsupervised Video Motion Retargeting},
 author={Yang, Zhuoqian and Zhu, Wentao and Wu, Wayne and Qian, Chen and Zhou, Qiang and Zhou, Bolei and Loy, Chen Change},
