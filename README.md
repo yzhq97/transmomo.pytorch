@@ -1,6 +1,6 @@
 # TransMoMo: Invariance-Driven Unsupervised Video Motion Retargeting
 
-#### [Webpage](https://yzhq97.github.io/transmomo/) | [Youtube](https://youtu.be/akbRtnRMkMk) | [Paper](https://arxiv.org/pdf/2003.14401.pdf)
+### [Project Page](https://yzhq97.github.io/transmomo/) | [YouTube](https://youtu.be/akbRtnRMkMk) | [Paper](https://arxiv.org/pdf/2003.14401.pdf)
 
 This is the official PyTorch implementation of the CVPR 2020 paper "TransMoMo: Invariance-Driven Unsupervised Video Motion Retargeting".
 
