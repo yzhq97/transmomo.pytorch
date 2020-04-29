@@ -1,6 +1,6 @@
 # TransMoMo: Invariance-Driven Unsupervised Video Motion Retargeting
 
-[![Paper](https://img.shields.io/badge/Python->=3.6-Blue?logo=python)](https://arxiv.org/pdf/2003.14401.pdf)[![Paper](https://img.shields.io/badge/PyTorch->=1.1.0-Orange?logo=pytorch)](https://arxiv.org/pdf/2003.14401.pdf)
+![Python](https://img.shields.io/badge/Python->=3.6-Blue?logo=python)  ![Pytorch](https://img.shields.io/badge/PyTorch->=1.1.0-Orange?logo=pytorch)
 
 ### [Project Page](https://yzhq97.github.io/transmomo/) | [YouTube](https://youtu.be/akbRtnRMkMk) | [Paper](https://arxiv.org/pdf/2003.14401.pdf)
 
@@ -16,8 +16,6 @@ This is the official PyTorch implementation of the CVPR 2020 paper "TransMoMo: I
 
 ## Environment
 
-* Python 3.6  
-* Pytorch >= 1.1.0
 ```
 conda install pytorch torchvision cudatoolkit=<your cuda version>
 conda install pyyaml scikit-image scikit-learn opencv
