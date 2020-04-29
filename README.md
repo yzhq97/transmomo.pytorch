@@ -1,12 +1,20 @@
-# [TransMoMo: Invariance-Driven Unsupervised Video Motion Retargeting](https://yzhq97.github.io/transmomo/)
+# TransMoMo: Invariance-Driven Unsupervised Video Motion Retargeting
+
+#### [Webpage](https://yzhq97.github.io/transmomo/) | [Youtube](https://youtu.be/akbRtnRMkMk) | [Paper](https://arxiv.org/pdf/2003.14401.pdf)
 
 This is the official PyTorch implementation of the CVPR 2020 paper "TransMoMo: Invariance-Driven Unsupervised Video Motion Retargeting".
 
-![](https://yzhq97.github.io/assets/transmomo/dance.gif "")
+
+
+<p align='center'>  
+  <img src='https://yzhq97.github.io/assets/transmomo/dance.gif' width='480'/>
+</p>
+
+
 
 ## Environment
 
-* Python3.6  
+* Python 3.6  
 * Pytorch >= 1.1.0
 ```
 conda install pytorch torchvision cudatoolkit=<your cuda version>
@@ -36,6 +44,7 @@ The file should contain an array with shape `15 x 2 x length`.
 The first dimension (15) corresponds the 15 body joint defined [here](https://github.com/yzhq97/transmomo.pytorch/blob/master/docs/keypoint_format.md).
 The second dimension (2) corresponds to x and y coordinates.
 The third dimenstion (length) is the temporal dimension. Sample command for inference:
+
 ```shell script
 python infer_pair.py 
 --config configs/transmomo.yaml 
@@ -46,7 +55,7 @@ python infer_pair.py
 --target_height 1920 --target_width 1080
 ```
 
-For generating motion retarget video, please refer to [pix2pixHD](https://github.com/NVIDIA/pix2pixHD).
+For skeleton-to-video rendering, please refer to [Everybody Dance Now](https://carolineec.github.io/everybody_dance_now/).
 
 ## Training
 
@@ -116,5 +125,4 @@ year={2020}
 
 ## Acknowledgement
 
-This repository is partly based Rundi Wu's [Learning Character-Agnostic Motion for Motion Retargeting in 2D](https://motionretargeting2d.github.io/) and Xun Huang's [MUNIT: Multimodal UNsupervised Image-to-image Translation](https://github.com/NVlabs/MUNIT).
-We sincerely thank them for their inspiration and contribution to the community.
+This repository is partly based on Rundi Wu's [Learning Character-Agnostic Motion for Motion Retargeting in 2D](https://motionretargeting2d.github.io/) and Xun Huang's [MUNIT: Multimodal UNsupervised Image-to-image Translation](https://github.com/NVlabs/MUNIT). The skeleton-to-rendering part is based on [Everybody Dance Now](https://carolineec.github.io/everybody_dance_now/). We sincerely thank them for their inspiration and contribution to the community.
