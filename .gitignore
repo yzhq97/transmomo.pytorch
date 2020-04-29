@@ -1,0 +1,7 @@
+/data
+.idea
+__pycache__
+*.pyc
+models/
+results/
+out

@@ -1,0 +1,14 @@
+easydict
+imageio-ffmpeg
+matplotlib
+numpy
+Pillow
+protobuf
+PyYAML
+scikit-image
+scikit-learn
+scipy
+tensorboardX
+torch>=1.1.0
+torchvision
+tqdm
