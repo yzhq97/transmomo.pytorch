@@ -38,28 +38,29 @@ Download mixamo pretrained model [here](https://drive.google.com/open?id=120LeeR
 
 ## Inference
 
-Here inference refers motion retargeting, i.e. transfering motion from a source skeleton to a target skeleton.
-We require the input skeleton sequences (e.g. extracted using a pose estimation method such as OpenPose) be provided in the format of a numpy `.npy` file.
-The file should contain an array with shape `15 x 2 x length`.
-The first dimension (15) corresponds the 15 body joint defined [here](https://github.com/yzhq97/transmomo.pytorch/blob/master/docs/keypoint_format.md).
-The second dimension (2) corresponds to x and y coordinates.
-The third dimenstion (length) is the temporal dimension. Sample command for inference:
+1. For *Skeleton Extraction*, please consider using a pose estimation method such as [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) or [DensePose](https://github.com/facebookresearch/DensePose). We require the input skeleton sequences to be in the format of a numpy `.npy` file with the following format:
+   - The file should contain an array with shape `15 x 2 x length`.
+   - The first dimension (15) corresponds the 15 body joint defined [here](https://github.com/yzhq97/transmomo.pytorch/blob/master/docs/keypoint_format.md).
+   - The second dimension (2) corresponds to x and y coordinates.
+   - The third dimension (length) is the temporal dimension. 
 
-```shell script
-python infer_pair.py 
---config configs/transmomo.yaml 
---checkpoint transmomo_mixamo_36_800_24/checkpoints/autoencoder_00200000.pt # replace with actual path
---source a.npy  # replace with actual path
---target b.npy  # replace with actual path
---source_width 1280 --source_height 720 
---target_height 1920 --target_width 1080
-```
+2. For *Motion Retargeting Network*, wo provide the sample command for inference:
 
-For skeleton-to-video rendering, please refer to [Everybody Dance Now](https://carolineec.github.io/everybody_dance_now/).
+  ```shell script
+  python infer_pair.py 
+  --config configs/transmomo.yaml 
+  --checkpoint transmomo_mixamo_36_800_24/checkpoints/autoencoder_00200000.pt # replace with actual path
+  --source a.npy  # replace with actual path
+  --target b.npy  # replace with actual path
+  --source_width 1280 --source_height 720 
+  --target_height 1920 --target_width 1080
+  ```
+
+3. For *Skeleton-to-Video Rendering*, please refer to [Everybody Dance Now](https://carolineec.github.io/everybody_dance_now/).
 
 ## Training
 
-To train the model, run
+To train the *Motion Retargeting Network*, run
 ```shell script
 python train.py --config configs/transmomo.yaml
 ```
@@ -103,11 +104,15 @@ motion-disentangle-research.pytorch
 
 ## TODOs
 
-* Detailed Documentation
-* Add example files
-* Release in-the-wild dancing video dataset (unannotated)
-* Tool for visualizing MSE error
-* Tool for converting keypoint format
+- [ ] Detailed documentation
+
+- [ ] Add example files
+
+- [ ] Release in-the-wild dancing video dataset (unannotated)
+
+- [ ] Tool for visualizing Mixamo test error
+
+- [ ] Tool for converting keypoint formats
 
 ## Citation
 
