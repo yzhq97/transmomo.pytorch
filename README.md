@@ -44,7 +44,7 @@ Download the mixamo pretrained model [here](https://drive.google.com/open?id=120
    - The second dimension (2) corresponds to x and y coordinates.
    - The third dimension (length) is the temporal dimension. 
 
-2. For *Motion Retargeting Network*, wo provide the sample command for inference:
+2. For *Motion Retargeting Network*, we provide the sample command for inference:
 
   ```shell script
   python infer_pair.py 
