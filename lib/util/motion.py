@@ -113,6 +113,12 @@ def normalize_motion(motion, mean_pose, std_pose):
         mean_pose = mean_pose[:, [0, 2]]
     if motion.shape[1] == 2 and std_pose.shape[1] == 3:
         std_pose = std_pose[:, [0, 2]]
+    if motion.shape[1] == 3 and mean_pose.shape[1] == 2:
+        mean_x, mean_y = mean_pose[:, 0], mean_pose[:, 1]
+        mean_pose = np.stack([mean_x, mean_x, mean_y], axis=1)
+    if motion.shape[1] == 3 and std_pose.shape[1] == 2:
+        std_x, std_y = std_pose[:, 0], std_pose[:, 1]
+        std_pose = np.stack([std_x, std_x, std_y], axis=1)
     return (motion - mean_pose[:, :, np.newaxis]) / std_pose[:, :, np.newaxis]
 
 
