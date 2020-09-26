@@ -109,6 +109,10 @@ def normalize_motion(motion, mean_pose, std_pose):
     :param std_pose: (J, 2)
     :return:
     """
+    if motion.shape[1] == 2 and mean_pose.shape[1] == 3:
+        mean_pose = mean_pose[:, [0, 2]]
+    if motion.shape[1] == 2 and std_pose.shape[1] == 3:
+        std_pose = std_pose[:, [0, 2]]
     return (motion - mean_pose[:, :, np.newaxis]) / std_pose[:, :, np.newaxis]
 
 
