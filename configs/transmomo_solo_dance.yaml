@@ -1,4 +1,4 @@
-trainer: Trans1xTrainer
+trainer: TransmomoTrainer
 K: 3
 rotation_axes: &rotation_axes [0, 0, 1] # horizontal, depth, vertical
 body_reference: &body_reference True
