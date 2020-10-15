@@ -332,3 +332,73 @@ class MixamoLimbScaleDataset(_MixamoDatasetBase):
 
         return {"x": x, "x_s": x_s, "mot": motion, "char": character, "view": view}
 
+
+class SoloDanceFullDataset1x(Dataset):
+
+    def __init__(self, phase, config):
+        super(SoloDanceFullDataset1x, self).__init__()
+        self.global_range = config.global_range
+        self.local_range = config.local_range
+
+        assert phase in ['train', 'test']
+        self.data_root = config.train_dir if phase=='train' else config.test_dir
+        self.phase = phase
+        self.unit = config.unit
+        self.meanpose_path = config.train_meanpose_path if phase == 'train' else config.test_meanpose_path
+        self.stdpose_path = config.train_stdpose_path if phase == 'train' else config.test_stdpose_path
+        self.character_names = sorted(os.listdir(self.data_root))
+
+        self.items = glob.glob(os.path.join(self.data_root, '*/*/motions/*.npy'))
+        self.mean_pose, self.std_pose = get_meanpose(phase, config)
+
+        if 'preload' in config and config.preload:
+            self.preload()
+            self.cached = True
+        else:
+            self.cached = False
+
+    def load_item(self, item):
+        if self.cached:
+            data = self.cache[item]
+        else:
+            data = np.load(item)
+        return data
+
+    def preload(self):
+        print("pre-loading into memory")
+        pbar = tqdm(total=len(self))
+        self.cache = {}
+        for item in self.items:
+            motion3d = np.load(item)
+            self.cache[item] = motion3d
+            pbar.update(1)
+
+    def preprocessing(self, motion):
+
+        motion = motion * self.unit
+
+        motion[1, :, :] = (motion[2, :, :] + motion[5, :, :]) / 2
+        motion[8, :, :] = (motion[9, :, :] + motion[12, :, :]) / 2
+
+        global_scale = self.global_range[0] + np.random.random() * (self.global_range[1] - self.global_range[0])
+        local_scales = self.local_range[0] + np.random.random([8]) * (self.local_range[1] - self.local_range[0])
+        motion_scale = scale_limbs(motion, global_scale, local_scales)
+
+        motion = localize_motion(motion)
+        motion_scale = localize_motion(motion_scale)
+        motion = normalize_motion(motion, self.mean_pose[:, [0, 2]], self.std_pose[:, [0, 2]])
+        motion_scale = normalize_motion(motion_scale, self.mean_pose[:, [0, 2]], self.std_pose[:, [0, 2]])
+        motion = motion.reshape((-1, motion.shape[-1]))
+        motion_scale = motion_scale.reshape((-1, motion_scale.shape[-1]))
+        motion = torch.from_numpy(motion).float()
+        motion_scale = torch.from_numpy(motion_scale).float()
+        return motion, motion_scale
+
+    def __len__(self):
+        return len(self.items)
+
+    def __getitem__(self, index):
+        item = self.items[index]
+        motion = self.load_item(item)
+        x, x_s = self.preprocessing(motion)
+        return {"x": x, "x_s": x_s}
