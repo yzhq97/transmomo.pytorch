@@ -91,7 +91,7 @@ data:
   local_range: [0.5, 2.0]          # limb scale: range of the gammas
   rotation_axes: *rotation_axes
   unit: 128
-  train_dir: ./data/mixamo/36_800_24/train
+  train_dir: ./data/solo_dance/train
   test_dir: ./data/mixamo/36_800_24/test
   num_workers: 4
   train_meanpose_path: ./data/mixamo/36_800_24/meanpose_with_view.npy

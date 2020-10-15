@@ -369,8 +369,8 @@ class SoloDanceDataset(Dataset):
         pbar = tqdm(total=len(self))
         self.cache = {}
         for item in self.items:
-            motion3d = np.load(item)
-            self.cache[item] = motion3d
+            motion = np.load(item)
+            self.cache[item] = motion
             pbar.update(1)
 
     def preprocessing(self, motion):
