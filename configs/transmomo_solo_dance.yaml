@@ -92,8 +92,8 @@ body_discriminator:
 
 # data options
 data:
-  train_cls: SoloDanceFullDataset1x
-  eval_cls: Mixamo2DFullDataset2x
+  train_cls: SoloDanceDataset
+  eval_cls: MixamoDataset
   global_range: [0.5, 2.0]
   local_range: [0.5, 2.0]
   rotation_axes: *rotation_axes

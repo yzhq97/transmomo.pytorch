@@ -333,10 +333,10 @@ class MixamoLimbScaleDataset(_MixamoDatasetBase):
         return {"x": x, "x_s": x_s, "mot": motion, "char": character, "view": view}
 
 
-class SoloDanceFullDataset1x(Dataset):
+class SoloDanceDataset(Dataset):
 
     def __init__(self, phase, config):
-        super(SoloDanceFullDataset1x, self).__init__()
+        super(SoloDanceDataset, self).__init__()
         self.global_range = config.global_range
         self.local_range = config.local_range
 
