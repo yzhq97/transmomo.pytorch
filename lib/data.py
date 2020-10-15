@@ -386,8 +386,8 @@ class SoloDanceDataset(Dataset):
 
         motion = localize_motion(motion)
         motion_scale = localize_motion(motion_scale)
-        motion = normalize_motion(motion, self.mean_pose[:, [0, 2]], self.std_pose[:, [0, 2]])
-        motion_scale = normalize_motion(motion_scale, self.mean_pose[:, [0, 2]], self.std_pose[:, [0, 2]])
+        motion = normalize_motion(motion, self.mean_pose, self.std_pose)
+        motion_scale = normalize_motion(motion_scale, self.mean_pose, self.std_pose)
         motion = motion.reshape((-1, motion.shape[-1]))
         motion_scale = motion_scale.reshape((-1, motion_scale.shape[-1]))
         motion = torch.from_numpy(motion).float()
