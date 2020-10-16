@@ -26,11 +26,24 @@ pip install -r requirements.txt
 
 ### Mixamo
 
+[Mixamo](https://www.mixamo.com/) is a synthesized 3D character animation dataset.
+
 1. Download mixamo data [here](https://drive.google.com/open?id=1z0kD_F4jHk2sMqgvYOPfTBsguU7uGY1x).
 2. Extract under `data/mixamo`
-3. run `sh scripts/preprocess.sh`
 
-For directions for downloading Mixamo data please refer to [this link](https://github.com/ChrisWu1997/2D-Motion-Retargeting/blob/master/dataset/Guide%20For%20Downloading%20Mixamo%20Data.md).
+For directions for downloading 3D Mixamo data please refer to [this link](https://github.com/ChrisWu1997/2D-Motion-Retargeting/blob/master/dataset/Guide%20For%20Downloading%20Mixamo%20Data.md).
+
+### SoloDance
+
+SoloDance is a collection of dancing videos on youtube. We use [DensePose](https://github.com/facebookresearch/DensePose) to extract skeleton sequences from these videos for training.
+
+1. Download the extracted skeleton sequences [here](https://drive.google.com/file/d/1366FaH0W2VYVW26ZbQJUp1x5GgMyMXuo/view?usp=sharing).
+2. Extract under `data/solo_dance`
+
+The original videos can be downloaded [here](https://drive.google.com/drive/folders/1hBj2uVJGABZz2aiqVYJpJ4SqBhYT-kYz?usp=sharing).
+
+### Preprocessing
+run `sh scripts/preprocess.sh` to preprocess the two datasets above.
 
 ## Pretrained model
 
@@ -64,13 +77,17 @@ To train the *Motion Retargeting Network*, run
 ```shell script
 python train.py --config configs/transmomo.yaml
 ```
+To train on the SoloDance dataest, run
+```shell script
+python train.py --config configs/transmomo_solo_dance.yaml
+```
 
 ## Testing
 
 For testing motion retargeting MSE, first generate the motion-retargeted motions with
 ```shell script
 python test.py
---config configs/transmomo.yaml
+--config configs/transmomo.yaml # replace with the actual config used for training
 --checkpoint transmomo_mixamo_36_800_24/checkpoints/autoencoder_00200000.pt
 --out_dir transmomo_mixamo_36_800_24_results # replace actual path to output directory
 ```
@@ -108,7 +125,7 @@ motion-disentangle-research.pytorch
 
 - [ ] Add example files
 
-- [ ] Release in-the-wild dancing video dataset (unannotated)
+- [x] Release in-the-wild dancing video dataset (unannotated)
 
 - [ ] Tool for visualizing Mixamo test error
 
