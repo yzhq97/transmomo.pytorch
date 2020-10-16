@@ -43,9 +43,9 @@ def train_with_config(config, opts, logger=None):
 
     # Setup logger and output folders
     train_writer = tensorboardX.SummaryWriter(os.path.join(opts.out_dir, config.name, "logs"))
-    checkpoint_directory = os.path.join(opts.out_dir, 'checkpoints')
+    checkpoint_directory = os.path.join(opts.out_dir, config.name, 'checkpoints')
     os.makedirs(checkpoint_directory, exist_ok=True)
-    shutil.copy(opts.config, os.path.join(opts.out_dir, "config.yaml")) # copy config file to output folder
+    shutil.copy(opts.config, os.path.join(opts.out_dir, config.name, "config.yaml")) # copy config file to output folder
 
     # Start training
     iterations = trainer.resume(checkpoint_directory, config=config) if opts.resume else 0
