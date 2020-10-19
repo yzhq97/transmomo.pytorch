@@ -28,7 +28,7 @@ pip install -r requirements.txt
 
 [Mixamo](https://www.mixamo.com/) is a synthesized 3D character animation dataset.
 
-1. Download mixamo data [here](https://drive.google.com/open?id=1z0kD_F4jHk2sMqgvYOPfTBsguU7uGY1x).
+1. Download mixamo data [here](https://drive.google.com/file/d/1lMa-4Bspn2_XV4wqo_s9Bfa35-19UAkB/view?usp=sharing).
 2. Extract under `data/mixamo`
 
 For directions for downloading 3D Mixamo data please refer to [this link](https://github.com/ChrisWu1997/2D-Motion-Retargeting/blob/master/dataset/Guide%20For%20Downloading%20Mixamo%20Data.md).
