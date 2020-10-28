@@ -4,7 +4,6 @@ thismodule = sys.modules[__name__]
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from lib.operation import rotate_and_maybe_project
 
 torch.manual_seed(123)
 
