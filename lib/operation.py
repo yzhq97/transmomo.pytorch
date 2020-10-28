@@ -201,10 +201,10 @@ def rotate_and_maybe_project_world(X, angles=None, body_reference=True, project_
             torch.eye(3, device=X.device).unsqueeze(0).repeat(batch_size, 1, 1)
         basis_vectors = rotate_basis_euler(basis_vectors, angles)
         X_trans = change_of_basis(X, basis_vectors, project_2d=project_2d)
-        X_trans = X_trans.reshape(batch_size * K, n_joints * out_dim, seq_len)
+        X_trans = X_trans.reshape(batch_size * K, n_joints, out_dim, seq_len)
     else:
         X_trans = change_of_basis(X, project_2d=project_2d)
-        X_trans = X_trans.reshape(batch_size, n_joints * out_dim, seq_len)
+        X_trans = X_trans.reshape(batch_size, n_joints, out_dim, seq_len)
 
     return X_trans
 
