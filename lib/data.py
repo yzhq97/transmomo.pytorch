@@ -47,6 +47,8 @@ class _MixamoDatasetBase(Dataset):
         self.motion_names = ['/'.join(x.split('/')[-3:]) for x in items]
 
         self.meanpose, self.stdpose = get_meanpose(phase, config)
+        self.meanpose = self.meanpose.astype(np.float32)
+        self.stdpose = self.stdpose.astype(np.float32)
 
         if 'preload' in config and config.preload:
             self.preload()
@@ -270,7 +272,8 @@ class MixamoDataset(_MixamoDatasetBase):
                 "x_abb": x_abb, "x_baa": x_baa,
                 "mot_a": mot_a, "mot_b": mot_b,
                 "char_a": char_a, "char_b": char_b,
-                "view_a": view_a, "view_b": view_b}
+                "view_a": view_a, "view_b": view_b,
+                "meanpose": self.meanpose, "stdpose": self.stdpose}
 
 
 class MixamoLimbScaleDataset(_MixamoDatasetBase):
@@ -330,7 +333,8 @@ class MixamoLimbScaleDataset(_MixamoDatasetBase):
 
         x, x_s = self.preprocessing(self.load_item(item), view, param)
 
-        return {"x": x, "x_s": x_s, "mot": motion, "char": character, "view": view}
+        return {"x": x, "x_s": x_s, "mot": motion, "char": character, "view": view,
+                "meanpose": self.meanpose, "stdpose": self.stdpose}
 
 
 class SoloDanceDataset(Dataset):
@@ -401,4 +405,4 @@ class SoloDanceDataset(Dataset):
         item = self.items[index]
         motion = self.load_item(item)
         x, x_s = self.preprocessing(motion)
-        return {"x": x, "x_s": x_s}
+        return {"x": x, "x_s": x_s, "meanpose": self.meanpose, "stdpose": self.stdpose}

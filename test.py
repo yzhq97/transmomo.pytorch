@@ -7,7 +7,7 @@ from lib.data import get_meanpose
 from lib.network import get_autoencoder
 from lib.util.motion import preprocess_mixamo, preprocess_test, postprocess
 from lib.util.general import get_config
-from lib.operation import rotate_and_maybe_project
+from lib.operation import rotate_and_maybe_project_world
 from itertools import combinations
 
 
