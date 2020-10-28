@@ -194,6 +194,7 @@ class Autoencoder3f(nn.Module):
         n_joints = channels // 3
         out = out.view(batch_size, n_joints, 3, seq_len)
         out = out[:, :, [0, 2], :]
+        out = out.view(batch_size, n_joints * 2, seq_len)
         return out
 
     def reconstruct3d(self, x):
@@ -212,6 +213,7 @@ class Autoencoder3f(nn.Module):
         n_joints = channels // 3
         out = out.view(batch_size, n_joints, 3, seq_len)
         out = out[:, :, [0, 2], :]
+        out = out.view(batch_size, n_joints * 2, seq_len)
         return out
 
     def interpolate(self, x_a, x_b, N):
@@ -241,6 +243,7 @@ class Autoencoder3f(nn.Module):
                 n_joints = channels // 3
                 out = out.view(batch_size, n_joints, 3, seq_len)
                 out = out[:, :, [0, 2], :]
+                out = out.view(batch_size, n_joints * 2, seq_len)
                 batch_out[:, i, j, :, :] = out
 
         return batch_out
