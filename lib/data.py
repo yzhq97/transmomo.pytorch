@@ -135,8 +135,10 @@ class _MixamoDatasetBase(Dataset):
 
 
 def get_meanpose(phase, config):
+
     meanpose_path = config.train_meanpose_path if phase == "train" else config.test_meanpose_path
     stdpose_path = config.train_stdpose_path if phase == "train" else config.test_stdpose_path
+
     if os.path.exists(meanpose_path) and os.path.exists(stdpose_path):
         meanpose = np.load(meanpose_path)
         stdpose = np.load(stdpose_path)
@@ -146,6 +148,15 @@ def get_meanpose(phase, config):
         np.save(stdpose_path, stdpose)
         print("meanpose saved at {}".format(meanpose_path))
         print("stdpose saved at {}".format(stdpose_path))
+
+    if meanpose.shape[-1] == 2:
+        mean_x, mean_y = meanpose[:, 0], meanpose[:, 1]
+        meanpose = np.stack([mean_x, mean_x, mean_y], axis=1)
+
+    if stdpose.shape[-1] == 2:
+        std_x, std_y = stdpose[:, 0], stdpose[:, 1]
+        stdpose = np.stack([std_x, std_x, std_y], axis=1)
+
     return meanpose, stdpose
 
 
