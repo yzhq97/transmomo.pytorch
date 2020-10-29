@@ -33,11 +33,14 @@ def postprocess(motion, meanpose, stdpose, unit=128, start=None):
 def preprocess_mixamo(motion, unit=128):
 
     _, D, _ = motion.shape
+    horizontal_dim = 0
     vertical_dim = D - 1
 
     motion[1, :, :] = (motion[2, :, :] + motion[5, :, :]) / 2
     motion[8, :, :] = (motion[9, :, :] + motion[12, :, :]) / 2
 
+    # rotate 180
+    motion[:, horizontal_dim, :] = - motion[:, horizontal_dim, :]
     motion[:, vertical_dim, :] = - motion[:, vertical_dim, :]
 
     motion = motion * unit
