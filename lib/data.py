@@ -364,7 +364,9 @@ class SoloDanceDataset(Dataset):
         self.character_names = sorted(os.listdir(self.data_root))
 
         self.items = glob.glob(os.path.join(self.data_root, '*/*/motions/*.npy'))
-        self.mean_pose, self.std_pose = get_meanpose(phase, config)
+        self.meanpose, self.stdpose = get_meanpose(phase, config)
+        self.meanpose = self.meanpose.astype(np.float32)
+        self.stdpose = self.stdpose.astype(np.float32)
 
         if 'preload' in config and config.preload:
             self.preload()
@@ -401,8 +403,8 @@ class SoloDanceDataset(Dataset):
 
         motion = localize_motion(motion)
         motion_scale = localize_motion(motion_scale)
-        motion = normalize_motion(motion, self.mean_pose, self.std_pose)
-        motion_scale = normalize_motion(motion_scale, self.mean_pose, self.std_pose)
+        motion = normalize_motion(motion, self.meanpose, self.stdpose)
+        motion_scale = normalize_motion(motion_scale, self.meanpose, self.stdpose)
         motion = motion.reshape((-1, motion.shape[-1]))
         motion_scale = motion_scale.reshape((-1, motion_scale.shape[-1]))
         motion = torch.from_numpy(motion).float()
