@@ -47,7 +47,7 @@ run `sh scripts/preprocess.sh` to preprocess the two datasets above.
 
 ## Pretrained model
 
-Download the mixamo pretrained model [here](https://drive.google.com/open?id=120LeeR1WjdO0Emk_6hVRERu1I6Bimi6Q).
+Download the pretrained models [here](https://drive.google.com/drive/folders/1xZ2Pw7ObrDUIH89ipH1diyFZJxeXNDd8?usp=sharing).
 
 ## Inference
 
