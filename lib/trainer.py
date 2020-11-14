@@ -7,7 +7,7 @@ import lib.network
 from lib.loss import *
 from lib.util.general import weights_init, get_model_list, get_scheduler
 from lib.network import Discriminator
-from lib.operation import rotate_and_maybe_project
+from lib.operation import rotate_and_maybe_project_learning
 
 class BaseTrainer(nn.Module):
 
@@ -145,8 +145,10 @@ class TransmomoTrainer(BaseTrainer):
 
     def dis_update(self, data, config):
 
-        x_a = data["x"].detach()
-        x_s = data["x_s"].detach() # the limb-scaled version of x_a
+        x_a = data["x"]
+        x_s = data["x_s"] # the limb-scaled version of x_a
+        meanpose = data["meanpose"][0]
+        stdpose = data["stdpose"][0]
 
         self.dis_opt.zero_grad()
 
@@ -166,8 +168,8 @@ class TransmomoTrainer(BaseTrainer):
         angles = angles.unsqueeze(0).unsqueeze(2)  # [B=1, K, T=1, 3]
 
         X_a_recon = self.autoencoder.decode(motion_a, body_a, view_a)
-        x_a_trans = rotate_and_maybe_project(X_a_recon, angles=angles, body_reference=config.autoencoder.body_reference,
-                                             project_2d=True)
+        x_a_trans = rotate_and_maybe_project_learning(X_a_recon, meanpose, stdpose, angles=angles,
+                                                      body_reference=config.autoencoder.body_reference, project_2d=True)
 
         x_a_exp = x_a.repeat_interleave(config.K, dim=0)
 
@@ -175,8 +177,8 @@ class TransmomoTrainer(BaseTrainer):
 
         if config.trans_gan_ls_w > 0:
             X_s_recon = self.autoencoder.decode(motion_s, body_s, view_s)
-            x_s_trans = rotate_and_maybe_project(X_s_recon, angles=angles,
-                                                 body_reference=config.autoencoder.body_reference, project_2d=True)
+            x_s_trans = rotate_and_maybe_project_learning(X_s_recon, meanpose, stdpose, angles=angles,
+                                                       body_reference=config.autoencoder.body_reference, project_2d=True)
             x_s_exp = x_s.repeat_interleave(config.K, dim=0)
             self.loss_dis_trans_ls = self.discriminator.calc_dis_loss(x_s_trans.detach(), x_s_exp)
         else:
@@ -190,8 +192,10 @@ class TransmomoTrainer(BaseTrainer):
 
     def ae_update(self, data, config):
 
-        x_a = data["x"].detach()
-        x_s = data["x_s"].detach()
+        x_a = data["x"]
+        x_s = data["x_s"]
+        meanpose = data["meanpose"][0]
+        stdpose = data["stdpose"][0]
         self.ae_opt.zero_grad()
 
         # encode
@@ -218,20 +222,24 @@ class TransmomoTrainer(BaseTrainer):
 
         # reconstruction
         X_a_recon = self.autoencoder.decode(motion_a, body_a, view_a)
-        x_a_recon = rotate_and_maybe_project(X_a_recon, angles=None, body_reference=config.autoencoder.body_reference, project_2d=True)
+        x_a_recon = rotate_and_maybe_project_learning(X_a_recon, meanpose, stdpose, angles=None,
+                                                      body_reference=config.autoencoder.body_reference, project_2d=True)
 
         X_s_recon = self.autoencoder.decode(motion_s, body_s, view_s)
-        x_s_recon = rotate_and_maybe_project(X_s_recon, angles=None, body_reference=config.autoencoder.body_reference, project_2d=True)
+        x_s_recon = rotate_and_maybe_project_learning(X_s_recon, meanpose, stdpose, angles=None,
+                                                      body_reference=config.autoencoder.body_reference, project_2d=True)
 
         self.loss_recon_x = 0.5 * self.recon_criterion(x_a_recon, x_a) +\
                                0.5 * self.recon_criterion(x_s_recon, x_s)
 
         # cross reconstruction
         X_as_recon = self.autoencoder.decode(motion_a, body_s, view_s)
-        x_as_recon = rotate_and_maybe_project(X_as_recon, angles=None, body_reference=config.autoencoder.body_reference, project_2d=True)
+        x_as_recon = rotate_and_maybe_project_learning(X_as_recon, meanpose, stdpose, angles=None,
+                                                       body_reference=config.autoencoder.body_reference, project_2d=True)
 
         X_sa_recon = self.autoencoder.decode(motion_s, body_a, view_a)
-        x_sa_recon = rotate_and_maybe_project(X_sa_recon, angles=None, body_reference=config.autoencoder.body_reference, project_2d=True)
+        x_sa_recon = rotate_and_maybe_project_learning(X_sa_recon, meanpose, stdpose, angles=None,
+                                                       body_reference=config.autoencoder.body_reference, project_2d=True)
 
         self.loss_cross_x = 0.5 * self.recon_criterion(x_as_recon, x_s) + 0.5 * self.recon_criterion(x_sa_recon, x_a)
 
@@ -241,8 +249,10 @@ class TransmomoTrainer(BaseTrainer):
         angles += self.angle_unit * self.rotation_axes * torch.randn([3], device=x_a.device)
         angles = angles.unsqueeze(0).unsqueeze(2)
 
-        x_a_trans = rotate_and_maybe_project(X_a_recon, angles=angles, body_reference=config.autoencoder.body_reference, project_2d=True)
-        x_s_trans = rotate_and_maybe_project(X_s_recon, angles=angles, body_reference=config.autoencoder.body_reference, project_2d=True)
+        x_a_trans = rotate_and_maybe_project_learning(X_a_recon, meanpose, stdpose, angles=angles,
+                                                      body_reference=config.autoencoder.body_reference, project_2d=True)
+        x_s_trans = rotate_and_maybe_project_learning(X_s_recon, meanpose, stdpose, angles=angles,
+                                                      body_reference=config.autoencoder.body_reference, project_2d=True)
 
         # GAN loss
         self.loss_gan_trans = self.discriminator.calc_gen_loss(x_a_trans)

@@ -11,6 +11,96 @@ import os
 
 eps = 1e-16
 
+
+def localize_motion_torch(motion):
+    """
+    :param motion: B x J x D x T
+    :return:
+    """
+    B, J, D, T = motion.size()
+
+    # subtract centers to local coordinates
+    centers = motion[:, 8:9, :, :] # B x 1 x D x (T-1)
+    motion = motion - centers
+
+    # adding velocity
+    translation = centers[:, :, :, 1:] - centers[:, :, :, :-1] # B x 1 x D x (T-1)
+    velocity = F.pad(translation, [1, 0], "constant", 0.) # B x 1 x D x T
+    motion = torch.cat([motion[:, :8], motion[:, 9:], velocity], dim=1)
+
+    return motion
+
+
+def normalize_motion_torch(motion, meanpose, stdpose):
+    """
+    :param motion: (B, J, D, T)
+    :param meanpose: (J, D)
+    :param stdpose: (J, D)
+    :return:
+    """
+    B, J, D, T = motion.size()
+    if D == 2 and meanpose.size(1) == 3:
+        meanpose = meanpose[:, [0, 2]]
+    if D == 2 and stdpose.size(1) == 3:
+        stdpose = stdpose[:, [0, 2]]
+    return (motion - meanpose.view(1, J, D, 1)) / stdpose.view(1, J, D, 1)
+
+
+def normalize_motion_inv_torch(motion, meanpose, stdpose):
+    """
+    :param motion: (B, J, D, T)
+    :param meanpose: (J, D)
+    :param stdpose: (J, D)
+    :return:
+    """
+    B, J, D, T = motion.size()
+    if D == 2 and meanpose.size(1) == 3:
+        meanpose = meanpose[:, [0, 2]]
+    if D == 2 and stdpose.size(1) == 3:
+        stdpose = stdpose[:, [0, 2]]
+    return motion * stdpose.view(1, J, D, 1) + meanpose.view(1, J, D, 1)
+
+
+def globalize_motion_torch(motion):
+    """
+    :param motion: B x J x D x T
+    :return:
+    """
+    B, J, D, T = motion.size()
+
+    motion_inv = torch.zeros_like(motion)
+    motion_inv[:, :8] = motion[:, :8]
+    motion_inv[:, 9:] = motion[:, 8:-1]
+
+    velocity = motion[:, -1:, :, :]
+    centers = torch.zeros_like(velocity)
+    displacement = torch.zeros_like(velocity[:, :, :, 0])
+
+    for t in range(T):
+        displacement += velocity[:, :, :, t]
+        centers[:, :, :, t] = displacement
+
+    motion_inv = motion_inv + centers
+
+    return motion_inv
+
+
+def restore_world_space(motion, meanpose, stdpose, n_joints=15):
+    B, C, T = motion.size()
+    motion = motion.view(B, n_joints, C // n_joints, T)
+    motion = normalize_motion_inv_torch(motion, meanpose, stdpose)
+    motion = globalize_motion_torch(motion)
+    return motion
+
+
+def convert_to_learning_space(motion, meanpose, stdpose):
+    B, J, D, T = motion.size()
+    motion = localize_motion_torch(motion)
+    motion = normalize_motion_torch(motion, meanpose, stdpose)
+    motion = motion.view(B, J*D, T)
+    return motion
+
+
 # tensor operations for rotating and projecting 3d skeleton sequence
 
 def get_body_basis(motion_3d):
@@ -100,12 +190,10 @@ def change_of_basis(motion_3d, basis_vectors=None, project_2d=False):
     return motion_proj
 
 
-def rotate_and_maybe_project(X, angles=None, body_reference=True, project_2d=False):
+def rotate_and_maybe_project_world(X, angles=None, body_reference=True, project_2d=False):
 
-    D = 2 if project_2d else 3
-    batch_size, channels, seq_len = X.size()
-    n_joints = channels // 3
-    X = X.view(batch_size, n_joints, 3, seq_len)
+    out_dim = 2 if project_2d else 3
+    batch_size, n_joints, _, seq_len = X.size()
 
     if angles is not None:
         K = angles.size(1)
@@ -113,13 +201,19 @@ def rotate_and_maybe_project(X, angles=None, body_reference=True, project_2d=Fal
             torch.eye(3, device=X.device).unsqueeze(0).repeat(batch_size, 1, 1)
         basis_vectors = rotate_basis_euler(basis_vectors, angles)
         X_trans = change_of_basis(X, basis_vectors, project_2d=project_2d)
-        X_trans = X_trans.reshape(batch_size * K, n_joints * D, seq_len)
+        X_trans = X_trans.reshape(batch_size * K, n_joints, out_dim, seq_len)
     else:
         X_trans = change_of_basis(X, project_2d=project_2d)
-        X_trans = X_trans.reshape(batch_size, n_joints * D, seq_len)
+        X_trans = X_trans.reshape(batch_size, n_joints, out_dim, seq_len)
 
     return X_trans
 
 
 
-
+def rotate_and_maybe_project_learning(X, meanpose, stdpose, angles=None, body_reference=True, project_2d=False):
+    batch_size, channels, seq_len = X.size()
+    n_joints = channels // 3
+    X = restore_world_space(X, meanpose, stdpose, n_joints)
+    X = rotate_and_maybe_project_world(X, angles, body_reference, project_2d)
+    X = convert_to_learning_space(X, meanpose, stdpose)
+    return X

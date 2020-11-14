@@ -47,6 +47,8 @@ class _MixamoDatasetBase(Dataset):
         self.motion_names = ['/'.join(x.split('/')[-3:]) for x in items]
 
         self.meanpose, self.stdpose = get_meanpose(phase, config)
+        self.meanpose = self.meanpose.astype(np.float32)
+        self.stdpose = self.stdpose.astype(np.float32)
 
         if 'preload' in config and config.preload:
             self.preload()
@@ -133,8 +135,10 @@ class _MixamoDatasetBase(Dataset):
 
 
 def get_meanpose(phase, config):
+
     meanpose_path = config.train_meanpose_path if phase == "train" else config.test_meanpose_path
     stdpose_path = config.train_stdpose_path if phase == "train" else config.test_stdpose_path
+
     if os.path.exists(meanpose_path) and os.path.exists(stdpose_path):
         meanpose = np.load(meanpose_path)
         stdpose = np.load(stdpose_path)
@@ -144,6 +148,15 @@ def get_meanpose(phase, config):
         np.save(stdpose_path, stdpose)
         print("meanpose saved at {}".format(meanpose_path))
         print("stdpose saved at {}".format(stdpose_path))
+
+    if meanpose.shape[-1] == 2:
+        mean_x, mean_y = meanpose[:, 0], meanpose[:, 1]
+        meanpose = np.stack([mean_x, mean_x, mean_y], axis=1)
+
+    if stdpose.shape[-1] == 2:
+        std_x, std_y = stdpose[:, 0], stdpose[:, 1]
+        stdpose = np.stack([std_x, std_x, std_y], axis=1)
+
     return meanpose, stdpose
 
 
@@ -270,7 +283,8 @@ class MixamoDataset(_MixamoDatasetBase):
                 "x_abb": x_abb, "x_baa": x_baa,
                 "mot_a": mot_a, "mot_b": mot_b,
                 "char_a": char_a, "char_b": char_b,
-                "view_a": view_a, "view_b": view_b}
+                "view_a": view_a, "view_b": view_b,
+                "meanpose": self.meanpose, "stdpose": self.stdpose}
 
 
 class MixamoLimbScaleDataset(_MixamoDatasetBase):
@@ -330,7 +344,8 @@ class MixamoLimbScaleDataset(_MixamoDatasetBase):
 
         x, x_s = self.preprocessing(self.load_item(item), view, param)
 
-        return {"x": x, "x_s": x_s, "mot": motion, "char": character, "view": view}
+        return {"x": x, "x_s": x_s, "mot": motion, "char": character, "view": view,
+                "meanpose": self.meanpose, "stdpose": self.stdpose}
 
 
 class SoloDanceDataset(Dataset):
@@ -349,7 +364,9 @@ class SoloDanceDataset(Dataset):
         self.character_names = sorted(os.listdir(self.data_root))
 
         self.items = glob.glob(os.path.join(self.data_root, '*/*/motions/*.npy'))
-        self.mean_pose, self.std_pose = get_meanpose(phase, config)
+        self.meanpose, self.stdpose = get_meanpose(phase, config)
+        self.meanpose = self.meanpose.astype(np.float32)
+        self.stdpose = self.stdpose.astype(np.float32)
 
         if 'preload' in config and config.preload:
             self.preload()
@@ -386,8 +403,8 @@ class SoloDanceDataset(Dataset):
 
         motion = localize_motion(motion)
         motion_scale = localize_motion(motion_scale)
-        motion = normalize_motion(motion, self.mean_pose, self.std_pose)
-        motion_scale = normalize_motion(motion_scale, self.mean_pose, self.std_pose)
+        motion = normalize_motion(motion, self.meanpose, self.stdpose)
+        motion_scale = normalize_motion(motion_scale, self.meanpose, self.stdpose)
         motion = motion.reshape((-1, motion.shape[-1]))
         motion_scale = motion_scale.reshape((-1, motion_scale.shape[-1]))
         motion = torch.from_numpy(motion).float()
@@ -401,4 +418,4 @@ class SoloDanceDataset(Dataset):
         item = self.items[index]
         motion = self.load_item(item)
         x, x_s = self.preprocessing(motion)
-        return {"x": x, "x_s": x_s}
+        return {"x": x, "x_s": x_s, "meanpose": self.meanpose, "stdpose": self.stdpose}

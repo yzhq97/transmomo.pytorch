@@ -4,8 +4,6 @@ thismodule = sys.modules[__name__]
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from lib.loss import temporal_pairwise_cosine_similarity
-from lib.operation import rotate_and_maybe_project
 
 torch.manual_seed(123)
 
@@ -192,7 +190,11 @@ class Autoencoder3f(nn.Module):
         body_b, _ = self.encode_body(x_b)
         view_c, _ = self.encode_view(x_c)
         out = self.decode(motion_a, body_b, view_c)
-        out = rotate_and_maybe_project(out, body_reference=self.body_reference, project_2d=True)
+        batch_size, channels, seq_len = out.size()
+        n_joints = channels // 3
+        out = out.view(batch_size, n_joints, 3, seq_len)
+        out = out[:, :, [0, 2], :]
+        out = out.view(batch_size, n_joints * 2, seq_len)
         return out
 
     def reconstruct3d(self, x):
@@ -207,7 +209,11 @@ class Autoencoder3f(nn.Module):
         body_code, _ = self.encode_body(x)
         view_code, _ = self.encode_view(x)
         out = self.decode(motion_code, body_code, view_code)
-        out = rotate_and_maybe_project(out, body_reference=self.body_reference, project_2d=True)
+        batch_size, channels, seq_len = out.size()
+        n_joints = channels // 3
+        out = out.view(batch_size, n_joints, 3, seq_len)
+        out = out[:, :, [0, 2], :]
+        out = out.view(batch_size, n_joints * 2, seq_len)
         return out
 
     def interpolate(self, x_a, x_b, N):
@@ -233,7 +239,11 @@ class Autoencoder3f(nn.Module):
                 body = (1. - body_weight) * body_a + body_weight * body_b
                 view = (1. - body_weight) * view_a + body_weight * view_b
                 out = self.decode(motion, body, view)
-                out = rotate_and_maybe_project(out, body_reference=self.body_reference, project_2d=True)
+                batch_size, channels, seq_len = out.size()
+                n_joints = channels // 3
+                out = out.view(batch_size, n_joints, 3, seq_len)
+                out = out[:, :, [0, 2], :]
+                out = out.view(batch_size, n_joints * 2, seq_len)
                 batch_out[:, i, j, :, :] = out
 
         return batch_out

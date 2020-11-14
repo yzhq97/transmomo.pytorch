@@ -5,7 +5,7 @@ import os
 import torch
 
 
-def preprocess_test(motion, mean_pose, std_pose, unit=128):
+def preprocess_test(motion, meanpose, stdpose, unit=128):
 
     motion = motion * unit
 
@@ -15,15 +15,15 @@ def preprocess_test(motion, mean_pose, std_pose, unit=128):
     start = motion[8, :, 0]
 
     motion = localize_motion(motion)
-    motion = normalize_motion(motion, mean_pose, std_pose)
+    motion = normalize_motion(motion, meanpose, stdpose)
 
     return motion, start
 
 
-def postprocess(motion, mean_pose, std_pose, unit=128, start=None):
+def postprocess(motion, meanpose, stdpose, unit=128, start=None):
 
     motion = motion.detach().cpu().numpy()[0].reshape(-1, 2, motion.shape[-1])
-    motion = normalize_motion_inv(motion, mean_pose, std_pose)
+    motion = normalize_motion_inv(motion, meanpose, stdpose)
     motion = globalize_motion(motion, start=start)
     motion = motion / unit
 
@@ -33,11 +33,14 @@ def postprocess(motion, mean_pose, std_pose, unit=128, start=None):
 def preprocess_mixamo(motion, unit=128):
 
     _, D, _ = motion.shape
+    horizontal_dim = 0
     vertical_dim = D - 1
 
     motion[1, :, :] = (motion[2, :, :] + motion[5, :, :]) / 2
     motion[8, :, :] = (motion[9, :, :] + motion[12, :, :]) / 2
 
+    # rotate 180
+    motion[:, horizontal_dim, :] = - motion[:, horizontal_dim, :]
     motion[:, vertical_dim, :] = - motion[:, vertical_dim, :]
 
     motion = motion * unit
@@ -102,28 +105,26 @@ def globalize_motion(motion, start=None, velocity=None):
     return motion_inv + centers.reshape((1, 2, -1))
 
 
-def normalize_motion(motion, mean_pose, std_pose):
+def normalize_motion(motion, meanpose, stdpose):
     """
     :param motion: (J, 2, T)
-    :param mean_pose: (J, 2)
-    :param std_pose: (J, 2)
+    :param meanpose: (J, 2)
+    :param stdpose: (J, 2)
     :return:
     """
-    if motion.shape[1] == 2 and mean_pose.shape[1] == 3:
-        mean_pose = mean_pose[:, [0, 2]]
-    if motion.shape[1] == 2 and std_pose.shape[1] == 3:
-        std_pose = std_pose[:, [0, 2]]
-    if motion.shape[1] == 3 and mean_pose.shape[1] == 2:
-        mean_x, mean_y = mean_pose[:, 0], mean_pose[:, 1]
-        mean_pose = np.stack([mean_x, mean_x, mean_y], axis=1)
-    if motion.shape[1] == 3 and std_pose.shape[1] == 2:
-        std_x, std_y = std_pose[:, 0], std_pose[:, 1]
-        std_pose = np.stack([std_x, std_x, std_y], axis=1)
-    return (motion - mean_pose[:, :, np.newaxis]) / std_pose[:, :, np.newaxis]
+    if motion.shape[1] == 2 and meanpose.shape[1] == 3:
+        meanpose = meanpose[:, [0, 2]]
+    if motion.shape[1] == 2 and stdpose.shape[1] == 3:
+        stdpose = stdpose[:, [0, 2]]
+    return (motion - meanpose[:, :, np.newaxis]) / stdpose[:, :, np.newaxis]
 
 
-def normalize_motion_inv(motion, mean_pose, std_pose):
-    return motion * std_pose[:, :, np.newaxis] + mean_pose[:, :, np.newaxis]
+def normalize_motion_inv(motion, meanpose, stdpose):
+    if motion.shape[1] == 2 and meanpose.shape[1] == 3:
+        meanpose = meanpose[:, [0, 2]]
+    if motion.shape[1] == 2 and stdpose.shape[1] == 3:
+        stdpose = stdpose[:, [0, 2]]
+    return motion * stdpose[:, :, np.newaxis] + meanpose[:, :, np.newaxis]
 
 
 def get_change_of_basis(motion3d, angles=None):
