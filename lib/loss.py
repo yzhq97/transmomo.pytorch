@@ -40,7 +40,7 @@ def triplet_margin_loss(seqs_a, seqs_b, neg_range=(0.0, 0.5), margin=0.2):
 
     batch_size, _, seq_len = seqs_a.size()
     sim_aa = temporal_pairwise_cosine_similarity(seqs_a, seqs_a)
-    sim_bb = temporal_pairwise_cosine_similarity(seqs_b, seqs_a)
+    sim_bb = temporal_pairwise_cosine_similarity(seqs_b, seqs_b)
     sim_ab = temporal_pairwise_cosine_similarity(seqs_a, seqs_b)
     sim_ba = sim_ab.transpose(1, 2)
 
