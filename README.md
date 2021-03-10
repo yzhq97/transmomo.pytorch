@@ -100,7 +100,7 @@ python scripts/compute_mse.py
 ## Project Structure
 
 ```
-motion-disentangle-research.pytorch
+transmomo.pytorch
 ├── configs - configuration files
 ├── data - place for storing data
 ├── docs - documentations
