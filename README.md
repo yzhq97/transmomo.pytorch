@@ -51,7 +51,7 @@ Download the pretrained models [here](https://drive.google.com/drive/folders/1xZ
 
 ## Inference
 
-1. For *Skeleton Extraction*, please consider using a pose estimation method such as [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) or [DensePose](https://github.com/facebookresearch/DensePose). We require the input skeleton sequences to be in the format of a numpy `.npy` file:
+1. For *Skeleton Extraction*, please consider using a pose estimation library such as [Detectron2](https://github.com/facebookresearch/detectron2). We require the input skeleton sequences to be in the format of a numpy `.npy` file:
    - The file should contain an array with shape `15 x 2 x length`.
    - The first dimension (15) corresponds the 15 body joint defined [here](https://github.com/yzhq97/transmomo.pytorch/blob/master/docs/keypoint_format.md).
    - The second dimension (2) corresponds to x and y coordinates.
